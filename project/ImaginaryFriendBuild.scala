@@ -9,7 +9,10 @@ object ImaginaryFriendBuild extends Build {
     settings(Sensible.settings).
     settings(sonatype("fommil", "imaginary-friend", Apache2)).
     settings(
-      libraryDependencies += "org.typelevel" %% "macro-compat" % "1.1.0",
+      libraryDependencies ++= Seq(
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+        "org.typelevel" %% "macro-compat" % "1.1.0"
+      ) ++ Sensible.testLibs(),
       addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full),
       updateOptions := updateOptions.value.withCachedResolution(true)
     )

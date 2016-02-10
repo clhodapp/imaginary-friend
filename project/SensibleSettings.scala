@@ -126,12 +126,14 @@ object Sensible {
     "com.google.code.findbugs" % "jsr305" % "3.0.1" % "provided"
   )
 
-  def testLibs(scalaV: String, config: String = "test") = Seq(
-    "org.scalatest" %% "scalatest" % scalatestVersion % config,
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % config,
-    "org.scalacheck" %% "scalacheck" % "1.12.5" % config,
-    "com.typesafe.akka" %% "akka-testkit" % akkaVersion % config,
-    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config
+  // TODO: automate testLibs as part of the testSettings
+  def testLibs(config: String = "test") = Seq(
+    "org.scalatest" %% "scalatest" % scalatestVersion % config
+    // TODO: needs a network connection
+    //"org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % config,
+    //"org.scalacheck" %% "scalacheck" % "1.12.5" % config,
+    //"com.typesafe.akka" %% "akka-testkit" % akkaVersion % config,
+    //"com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config
   ) ++ logback.map(_ % config)
 
   // e.g. YOURKIT_AGENT=/opt/yourkit/bin/linux-x86-64/libyjpagent.so
