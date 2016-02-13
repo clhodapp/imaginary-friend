@@ -1,2 +1,5 @@
 target/
 *.log
+.ensime_cache/
+.ensime
+.idea/
