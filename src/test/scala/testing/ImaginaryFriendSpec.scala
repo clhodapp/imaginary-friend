@@ -8,8 +8,8 @@ import fommil.imaginary
 
 import org.scalatest._
 
-//@imaginary
-//class Me
+@imaginary
+class Me
 
 @imaginary
 class Myself(val foo: String, val bar: Long)
@@ -24,7 +24,7 @@ object MyObj {
 
 class ImaginaryFriendSpec extends FlatSpec with Matchers {
   "@imaginary" should "generate companion's apply with no parameters" in {
-    // val me: Me = Me()
+    val me: Me = Me()
   }
 
   //  it should "generate companion apply with parameters" in {

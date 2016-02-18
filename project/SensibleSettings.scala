@@ -13,10 +13,6 @@ import com.typesafe.sbt.SbtScalariform._
 object Sensible {
 
   lazy val settings = Seq(
-    organization := "com.fommil",
-    scalaVersion := "2.11.7",
-    version := "1.0.0-SNAPSHOT",
-
     ivyLoggingLevel := UpdateLogging.Quiet,
 
     scalacOptions in Compile ++= Seq(
@@ -40,19 +36,17 @@ object Sensible {
         // fatal warnings can get in the way during the DEV cycle
         if (sys.env.contains("CI")) Seq("-Xfatal-warnings")
         else Nil
-    },
+      },
     javacOptions in (Compile, compile) ++= Seq(
       "-source", "1.6", "-target", "1.6", "-Xlint:all", "-Werror",
       "-Xlint:-options", "-Xlint:-path", "-Xlint:-processing"
     ),
     javacOptions in doc ++= Seq("-source", "1.6"),
 
-    javaOptions += "-Dfile.encoding=UTF8",
     javaOptions := Seq("-Xss2m", "-XX:MaxPermSize=256m", "-Xms1g", "-Xmx1g"),
+    javaOptions += "-Dfile.encoding=UTF8",
     javaOptions ++= Seq("-XX:+UseConcMarkSweepGC", "-XX:+CMSIncrementalMode"),
     javaOptions in run ++= yourkitAgent,
-
-    updateOptions := updateOptions.value.withCachedResolution(true),
 
     maxErrors := 1,
     fork := true,
@@ -67,9 +61,8 @@ object Sensible {
       "org.scala-lang" % "scalap" % scalaVersion.value,
       "org.scala-lang.modules" %% "scala-xml" % scalaModulesVersion,
       "org.scala-lang.modules" %% "scala-parser-combinators" % scalaModulesVersion,
-      "org.scalamacros" %% "quasiquotes" % quasiquotesVersion,
-      shapeless
-    ) ++ logback ++ guava
+      "org.scalamacros" %% "quasiquotes" % quasiquotesVersion
+    ) ++ logback ++ guava ++ shapeless(scalaVersion.value)
   ) ++ inConfig(Test)(testSettings) ++ scalariformSettings
 
   // TODO: scalariformSettingsWithIt generalised
@@ -110,13 +103,19 @@ object Sensible {
   val akkaVersion = "2.3.14"
   val streamsVersion = "1.0"
   val scalatestVersion = "2.2.6"
-  val logbackVersion = "1.7.13"
+  val logbackVersion = "1.7.16"
   val quasiquotesVersion = "2.0.1"
   val guavaVersion = "18.0"
 
-  val shapeless = "com.chuusai" %% "shapeless" % "2.2.5"
+  val macroParadise = Seq(
+    compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+  )
+  def shapeless(scalaVersion: String) = {
+    if (scalaVersion.startsWith("2.10.")) macroParadise
+    else Nil
+  } :+ "com.chuusai" %% "shapeless" % "2.2.5"
   val logback = Seq(
-    "ch.qos.logback" % "logback-classic" % "1.1.3",
+    "ch.qos.logback" % "logback-classic" % "1.1.5",
     "org.slf4j" % "slf4j-api" % logbackVersion,
     "org.slf4j" % "jul-to-slf4j" % logbackVersion,
     "org.slf4j" % "jcl-over-slf4j" % logbackVersion
@@ -128,12 +127,11 @@ object Sensible {
 
   // TODO: automate testLibs as part of the testSettings
   def testLibs(config: String = "test") = Seq(
-    "org.scalatest" %% "scalatest" % scalatestVersion % config
-    // TODO: needs a network connection
-    //"org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % config,
-    //"org.scalacheck" %% "scalacheck" % "1.12.5" % config,
-    //"com.typesafe.akka" %% "akka-testkit" % akkaVersion % config,
-    //"com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config
+    "org.scalatest" %% "scalatest" % scalatestVersion % config,
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % config,
+    "org.scalacheck" %% "scalacheck" % "1.12.5" % config,
+    "com.typesafe.akka" %% "akka-testkit" % akkaVersion % config,
+    "com.typesafe.akka" %% "akka-slf4j" % akkaVersion % config
   ) ++ logback.map(_ % config)
 
   // e.g. YOURKIT_AGENT=/opt/yourkit/bin/linux-x86-64/libyjpagent.so
